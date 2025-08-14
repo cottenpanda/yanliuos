@@ -1721,6 +1721,11 @@ class PortfolioOS {
             font-weight: 500;
             font-family: 'Noto Sans', 'Noto Sans CJK JP', 'Noto Sans CJK KR', 'Noto Sans CJK SC', 'Noto Sans CJK TC', system-ui, -apple-system, sans-serif;
             animation: slideInRight 0.3s ease;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         `;
 
         document.body.appendChild(notification);
@@ -2900,14 +2905,11 @@ class PortfolioOS {
         
         // Only work with notes (no folders)
         const notes = stickyNotes.filter(item => item.type !== 'folder');
-        console.log('Total notes:', notes.length);
         
         // Separate pinned and regular notes
         const pinnedNotes = notes.filter(note => note.pinned);
         const regularNotes = notes.filter(note => !note.pinned);
         
-        console.log('Pinned notes:', pinnedNotes.length);
-        console.log('Regular notes:', regularNotes.length);
         
         // Sort by timestamp (newest first)
         pinnedNotes.sort((a, b) => {
@@ -3469,20 +3471,16 @@ class PortfolioOS {
     }
     
     editStickyNote(note) {
-        console.log('editStickyNote called for note:', note.id);
-        
         // Check if a window for this note is already open
         const existingWindow = document.querySelector(`[data-note-id="${note.id}"].note-editor-window`);
-        console.log('Existing window found:', existingWindow);
         
-        if (existingWindow && existingWindow.classList.contains('active')) {
-            console.log('Window exists and is active, bringing to front');
-            // Window already exists - bring it to front
+        if (existingWindow) {
+            // Window already exists - bring it to front and make it active
+            existingWindow.classList.add('active');
             this.bringWindowToFront(existingWindow);
             return;
         }
         
-        console.log('Creating new window');
         // Create a new note window for editing this specific note
         this.createNoteWindow(note);
     }
@@ -3493,11 +3491,8 @@ class PortfolioOS {
             return;
         }
         
-        // Don't bring inactive windows to front
-        if (!targetWindow.classList.contains('active')) {
-            console.log('🚫 Not bringing window to front - window is not active');
-            return;
-        }
+        // Make sure the window is active when bringing to front
+        targetWindow.classList.add('active');
         
         // Get window identifier
         const windowId = this.getWindowId(targetWindow);
@@ -4314,10 +4309,19 @@ class PortfolioOS {
     
     autoSaveNote(noteWindow) {
         const editor = noteWindow.querySelector('.note-modal-editor');
-        const content = editor.innerHTML.trim();
         
-        if (!content) {
-            return; // Don't save empty notes
+        // Clone editor to remove auto-save indicator before getting content
+        const editorClone = editor.cloneNode(true);
+        const indicator = editorClone.querySelector('.auto-save-indicator');
+        if (indicator) {
+            indicator.remove();
+        }
+        const content = editorClone.innerHTML.trim();
+        
+        // For existing notes, always save pin state even if content is empty
+        // For new notes, only save if content exists OR if trying to pin/unpin
+        if (!content && !noteWindow.noteData) {
+            return; // Don't save completely new empty notes
         }
         
         const stickyNotes = JSON.parse(localStorage.getItem('sticky-notes') || '[]');
@@ -4341,8 +4345,8 @@ class PortfolioOS {
                 // Update the noteData reference
                 noteWindow.noteData.pinned = noteWindow.isPinned || false;
             }
-        } else {
-            // Creating new note
+        } else if (content) {
+            // Creating new note with content
             const newNote = {
                 id: Date.now(),
                 type: 'note',
