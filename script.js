@@ -1433,6 +1433,10 @@ class PortfolioOS {
 
                 const window = header.closest('.window');
                 
+                // Bring window to front when starting to drag
+                console.log('🔄 Bringing window to front during drag');
+                this.bringWindowToFront(window, true);
+                
                 startX = e.clientX;
                 startY = e.clientY;
                 
@@ -3900,9 +3904,19 @@ class PortfolioOS {
         
         // Delete button
         if (deleteBtn) {
-            deleteBtn.addEventListener('click', (e) => {
+            console.log('🔧 Setting up delete button listener');
+            deleteBtn.addEventListener('mousedown', (e) => {
+                console.log('🗑️ Delete button mousedown');
                 e.preventDefault();
                 e.stopPropagation();
+                e.stopImmediatePropagation();
+            });
+            
+            deleteBtn.addEventListener('click', (e) => {
+                console.log('🗑️ Delete button clicked');
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
                 this.showDeleteConfirmation(noteWindow);
             });
         }
@@ -4569,7 +4583,7 @@ class PortfolioOS {
         deletePopup.style.position = 'fixed';
         deletePopup.style.top = (buttonRect.bottom + 8) + 'px';
         deletePopup.style.left = buttonRect.left + 'px';
-        deletePopup.style.zIndex = '100000';
+        deletePopup.style.zIndex = '999999';
         deletePopup.style.visibility = 'visible';
         
         // Setup button handlers
