@@ -9355,6 +9355,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.gameApp = new FiveInARowGame();
     window.musicPlayer = new MusicPlayer();
     
+    // Initialize notebook immediately so sticky notes work
+    window.portfolioOS.initializeNotebook();
+    
     // Global function to manually setup drag and drop
     window.setupStickerDrag = () => {
         console.log('Manual sticker drag setup triggered');
