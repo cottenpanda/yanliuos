@@ -1387,6 +1387,12 @@ class PortfolioOS {
                     return;
                 }
                 
+                // Don't bring to front if a drag just ended
+                if (window._dragJustEnded) {
+                    console.log('🚫 Not bringing to front - drag just ended');
+                    return;
+                }
+                
                 // Only bring to front if not clicking on window header or controls
                 if (!e.target.closest('.window-header') && 
                     !e.target.closest('.window-controls') &&
@@ -1416,26 +1422,25 @@ class PortfolioOS {
             let hasMoved = false;
             let startX, startY, startLeft, startTop;
             let animationFrameId = null;
+            let dragJustEnded = false;
 
             header.addEventListener('mousedown', (e) => {
-                console.log('📝 Header mousedown:', e.target);
                 // Don't drag if clicking on controls, resize handles, or buttons
                 if (e.target.closest('.window-controls') || 
                     e.target.closest('.resize-handle') ||
                     e.target.closest('button') ||
                     e.target.classList.contains('close') ||
                     e.target.classList.contains('minimize')) {
-                    console.log('🚫 Drag blocked - clicked on control');
                     return;
                 }
-                
-                // console.log('✅ Drag allowed - setting up listeners');
 
                 const window = header.closest('.window');
+                console.log('🎯 DRAG START - Window z-index:', window.style.zIndex);
                 
-                // Bring window to front when starting to drag
-                console.log('🔄 Bringing window to front during drag');
-                this.bringWindowToFront(window, true);
+                // IMMEDIATELY set highest z-index on mousedown to ensure window stays on top
+                this.windowZIndex += 10;
+                window.style.setProperty('z-index', this.windowZIndex, 'important');
+                console.log('🚀 Set window z-index to:', this.windowZIndex);
                 
                 startX = e.clientX;
                 startY = e.clientY;
@@ -1457,12 +1462,8 @@ class PortfolioOS {
                         // Prevent default behavior once we start dragging
                         e.preventDefault();
                         
-                        // Bring window to front and setup for dragging
-                        this.bringWindowToFront(window, true);
+                        // Setup for dragging - z-index already set on mousedown
                         window.classList.add('dragging');
-                        
-                        // During drag, use a high temporary z-index that doesn't conflict with layer system
-                        window.style.setProperty('z-index', '10000', 'important');
                         
                         // Ensure the window is ready for dragging
                         window.style.position = 'absolute';
@@ -1502,6 +1503,9 @@ class PortfolioOS {
                         window.classList.remove('dragging');
                         // After dragging, properly set z-index to stay on top
                         this.bringWindowToFront(window, false);
+                        window._dragJustEnded = true;
+                        // Clear the flag after a brief delay to prevent click interference
+                        setTimeout(() => { window._dragJustEnded = false; }, 50);
                     } else if (!hasMoved) {
                         // If no dragging occurred, just bring window to front
                         this.bringWindowToFront(window);
@@ -2687,6 +2691,11 @@ class PortfolioOS {
                 return;
             }
 
+            // IMMEDIATELY set highest z-index on mousedown to ensure window stays on top
+            this.windowZIndex += 10;
+            stickerWindow.style.setProperty('z-index', this.windowZIndex, 'important');
+            console.log('🚀 Set sticker window z-index to:', this.windowZIndex);
+            
             // Initialize starting position
             startX = e.clientX;
             startY = e.clientY;
@@ -2704,12 +2713,8 @@ class PortfolioOS {
                     // Prevent default behavior once we start dragging
                     e.preventDefault();
                     
-                    // Bring window to front and setup for dragging
-                    this.bringWindowToFront(stickerWindow, true);
+                    // Setup for dragging - z-index already set on mousedown
                     stickerWindow.classList.add('dragging');
-                    
-                    // During drag, use a high temporary z-index that doesn't conflict with layer system
-                    stickerWindow.style.setProperty('z-index', '10000', 'important');
                 }
                 
                 if (isDragging) {
@@ -3499,6 +3504,12 @@ class PortfolioOS {
     bringWindowToFront(targetWindow, isDuringDrag = false) {
         if (!targetWindow) {
             console.log('🚫 Not bringing window to front - targetWindow is null');
+            return;
+        }
+        
+        // Skip layer management if window is currently being dragged
+        if (targetWindow.classList.contains('dragging') && isDuringDrag) {
+            console.log('🚫 Skipping layer management - window is being dragged');
             return;
         }
         
@@ -7982,6 +7993,14 @@ class MusicPlayer {
             isDragging = true;
             dragStarted = false;
             this.playerElement.classList.add('dragging');
+            
+            // IMMEDIATELY set highest z-index on mousedown to ensure player stays on top
+            if (window.portfolioOS) {
+                window.portfolioOS.windowZIndex += 10;
+                this.playerElement.style.setProperty('z-index', window.portfolioOS.windowZIndex, 'important');
+                console.log('🚀 Set music player z-index to:', window.portfolioOS.windowZIndex);
+            }
+            
             startX = e.clientX;
             startY = e.clientY;
             
