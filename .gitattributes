@@ -1,5 +1,5 @@
 *.gif filter=lfs diff=lfs merge=lfs -text
 *.webp filter=lfs diff=lfs merge=lfs -text
-*.png filter=lfs diff=lfs merge=lfs -text
 *.mp3 filter=lfs diff=lfs merge=lfs -text
-Camera.png filter=lfs diff=lfs merge=lfs -text
+# Exclude Camera.png from LFS to fix GitHub Pages deployment
+# Camera.png filter=lfs diff=lfs merge=lfs -text
