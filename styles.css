@@ -4164,11 +4164,44 @@ body {
     background: #f0f0f0;
 }
 
+/* New insights header styling */
+.insights-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 5px;
+}
+
+.insights-title {
+    color: #000;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+    font-family: 'Noto Sans', 'Noto Sans CJK JP', 'Noto Sans CJK KR', 'Noto Sans CJK SC', 'Noto Sans CJK TC', system-ui, -apple-system, sans-serif;
+}
+
+.insights-dropdown {
+    padding: 6px 24px 6px 10px;
+    border: none;
+    border-radius: 6px;
+    background: #E9ECEF url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 8px center;
+    background-repeat: no-repeat;
+    background-size: 12px;
+    font-size: 13px;
+    color: #666;
+    font-family: 'Noto Sans', 'Noto Sans CJK JP', 'Noto Sans CJK KR', 'Noto Sans CJK SC', 'Noto Sans CJK TC', system-ui, -apple-system, sans-serif;
+    cursor: pointer;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 15px;
-    margin-bottom: 25px;
 }
 
 .stat-card {
@@ -4271,8 +4304,7 @@ body {
 .mood-analytics-section h3 {
     margin: 0 0 20px 0;
     color: #333;
-    font-size: 18px;
-    border-bottom: 2px solid #e9ecef;
+    font-size: 16px;
     padding-bottom: 10px;
 }
 

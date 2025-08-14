@@ -9667,31 +9667,27 @@ PortfolioOS.prototype.setupMoodCalendarListeners = function() {
 };
 
 PortfolioOS.prototype.setupInsightsTabs = function() {
-    const tabButtons = document.querySelectorAll('.tab-btn');
+    const insightsDropdown = document.getElementById('insights-select');
     
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Remove active class from all tabs
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Add active class to clicked tab
-            button.classList.add('active');
-            
+    if (insightsDropdown) {
+        insightsDropdown.addEventListener('change', () => {
             // Play tab switch sound
             this.playTabSwitchSound();
             
-            // Update analytics based on selected tab
-            const tabType = button.getAttribute('data-tab');
-            if (tabType === 'monthly') {
+            // Update analytics based on selected option
+            const selectedValue = insightsDropdown.value;
+            if (selectedValue === 'week') {
+                this.updateWeeklyInsights();
+            } else if (selectedValue === 'month') {
                 this.updateMonthlyInsights();
-            } else if (tabType === 'yearly') {
+            } else if (selectedValue === 'year') {
                 this.updateYearlyInsights();
             }
         });
-    });
+    }
     
-    // Initialize with monthly insights
-    this.updateMonthlyInsights();
+    // Initialize with weekly insights (default selection)
+    this.updateWeeklyInsights();
 };
 
 PortfolioOS.prototype.updateMonthlyInsights = function() {
@@ -9702,6 +9698,81 @@ PortfolioOS.prototype.updateMonthlyInsights = function() {
 PortfolioOS.prototype.updateYearlyInsights = function() {
     // Update stats for current year
     this.updateYearStats();
+};
+
+PortfolioOS.prototype.updateWeeklyInsights = function() {
+    // Update stats for current week
+    this.updateWeekStats();
+};
+
+PortfolioOS.prototype.updateWeekStats = function() {
+    const moodData = this.getMoodData();
+    const currentDate = new Date();
+    
+    // Get the start of the current week (Sunday)
+    const startOfWeek = new Date(currentDate);
+    startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+    
+    // Filter data for current week
+    const weeklyData = Object.keys(moodData).filter(dateKey => {
+        const entryDate = new Date(dateKey);
+        return entryDate >= startOfWeek && entryDate <= currentDate;
+    });
+    
+    // Update total entries
+    const totalEntriesElement = document.getElementById('total-entries');
+    if (totalEntriesElement) {
+        totalEntriesElement.textContent = weeklyData.length;
+    }
+    
+    // Calculate most picked mood for week
+    if (weeklyData.length > 0) {
+        // Count frequency of each mood
+        const moodCount = {};
+        weeklyData.forEach(dateKey => {
+            const mood = moodData[dateKey];
+            moodCount[mood] = (moodCount[mood] || 0) + 1;
+        });
+        
+        // Find the most frequent mood
+        const mostPickedMood = Object.keys(moodCount).reduce((a, b) => 
+            moodCount[a] > moodCount[b] ? a : b
+        );
+        
+        const avgMoodElement = document.getElementById('avg-mood');
+        if (avgMoodElement) {
+            avgMoodElement.innerHTML = `<img src="Mood track emojis/${parseInt(mostPickedMood) + 1}.svg" alt="Top mood" style="width: 36px; height: 36px;" />`;
+        }
+    } else {
+        const avgMoodElement = document.getElementById('avg-mood');
+        if (avgMoodElement) {
+            avgMoodElement.textContent = '-';
+        }
+    }
+    
+    // Find best day (highest mood) in current week
+    const bestDayElement = document.getElementById('best-day');
+    if (bestDayElement && weeklyData.length > 0) {
+        const bestDate = weeklyData.reduce((best, dateKey) => {
+            return moodData[dateKey] > moodData[best] ? dateKey : best;
+        });
+        const bestDay = new Date(bestDate).toLocaleDateString('en-US', { weekday: 'short' });
+        bestDayElement.textContent = bestDay;
+    } else if (bestDayElement) {
+        bestDayElement.textContent = '-';
+    }
+    
+    // Calculate weekly streak (simplified)
+    const streakElement = document.getElementById('current-streak');
+    if (streakElement) {
+        const currentStreak = weeklyData.length;
+        streakElement.textContent = currentStreak;
+        
+        // Play celebration sound for milestones
+        if (currentStreak > 0 && currentStreak === 7) {
+            setTimeout(() => this.playStreakCelebrationSound(), 500);
+        }
+    }
 };
 
 PortfolioOS.prototype.updateMonthStatsNew = function() {
@@ -9722,13 +9793,23 @@ PortfolioOS.prototype.updateMonthStatsNew = function() {
         totalEntriesElement.textContent = monthlyData.length;
     }
     
-    // Calculate average mood for month
+    // Calculate most picked mood for month
     if (monthlyData.length > 0) {
-        const totalMood = monthlyData.reduce((sum, dateKey) => sum + moodData[dateKey], 0);
-        const avgMoodIndex = Math.round(totalMood / monthlyData.length);
+        // Count frequency of each mood
+        const moodCount = {};
+        monthlyData.forEach(dateKey => {
+            const mood = moodData[dateKey];
+            moodCount[mood] = (moodCount[mood] || 0) + 1;
+        });
+        
+        // Find the most frequent mood
+        const mostPickedMood = Object.keys(moodCount).reduce((a, b) => 
+            moodCount[a] > moodCount[b] ? a : b
+        );
+        
         const avgMoodElement = document.getElementById('avg-mood');
         if (avgMoodElement) {
-            avgMoodElement.innerHTML = `<img src="Mood track emojis/${avgMoodIndex + 1}.svg" alt="Average mood" style="width: 36px; height: 36px;" />`;
+            avgMoodElement.innerHTML = `<img src="Mood track emojis/${parseInt(mostPickedMood) + 1}.svg" alt="Most picked mood" style="width: 36px; height: 36px;" />`;
         }
     } else {
         const avgMoodElement = document.getElementById('avg-mood');
@@ -9778,13 +9859,23 @@ PortfolioOS.prototype.updateYearStats = function() {
         totalEntriesElement.textContent = yearlyData.length;
     }
     
-    // Calculate average mood for year
+    // Calculate most picked mood for year
     if (yearlyData.length > 0) {
-        const totalMood = yearlyData.reduce((sum, dateKey) => sum + moodData[dateKey], 0);
-        const avgMoodIndex = Math.round(totalMood / yearlyData.length);
+        // Count frequency of each mood
+        const moodCount = {};
+        yearlyData.forEach(dateKey => {
+            const mood = moodData[dateKey];
+            moodCount[mood] = (moodCount[mood] || 0) + 1;
+        });
+        
+        // Find the most frequent mood
+        const mostPickedMood = Object.keys(moodCount).reduce((a, b) => 
+            moodCount[a] > moodCount[b] ? a : b
+        );
+        
         const avgMoodElement = document.getElementById('avg-mood');
         if (avgMoodElement) {
-            avgMoodElement.innerHTML = `<img src="Mood track emojis/${avgMoodIndex + 1}.svg" alt="Average mood" style="width: 36px; height: 36px;" />`;
+            avgMoodElement.innerHTML = `<img src="Mood track emojis/${parseInt(mostPickedMood) + 1}.svg" alt="Most picked mood" style="width: 36px; height: 36px;" />`;
         }
     } else {
         const avgMoodElement = document.getElementById('avg-mood');
@@ -9921,17 +10012,19 @@ PortfolioOS.prototype.displayTodayMood = function(mood) {
 };
 
 PortfolioOS.prototype.updateMoodAnalytics = function() {
-    // Update the current active tab insights
-    const activeTab = document.querySelector('.tab-btn.active');
-    if (activeTab) {
-        const tabType = activeTab.getAttribute('data-tab');
-        if (tabType === 'monthly') {
+    // Update the current selected insights
+    const insightsDropdown = document.getElementById('insights-select');
+    if (insightsDropdown) {
+        const selectedValue = insightsDropdown.value;
+        if (selectedValue === 'week') {
+            this.updateWeeklyInsights();
+        } else if (selectedValue === 'month') {
             this.updateMonthlyInsights();
-        } else if (tabType === 'yearly') {
+        } else if (selectedValue === 'year') {
             this.updateYearlyInsights();
         }
     } else {
-        // Default to monthly if no tab is active
+        // Default to monthly if dropdown is not found
         this.updateMonthlyInsights();
     }
     

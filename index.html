@@ -638,17 +638,21 @@
                             </div>
                         </div>
 
-                        <!-- Monthly Dashboard -->
+                        <!-- Insights Dashboard -->
                         <div class="mood-dashboard">
-                            <div class="insights-tabs">
-                                <button class="tab-btn active" data-tab="monthly">Monthly insights</button>
-                                <button class="tab-btn" data-tab="yearly">Yearly insights</button>
+                            <div class="insights-header">
+                                <h3 class="insights-title">Insights</h3>
+                                <select id="insights-select" class="insights-dropdown">
+                                    <option value="week" selected>This week</option>
+                                    <option value="month">This month</option>
+                                    <option value="year">This year</option>
+                                </select>
                             </div>
                             <div class="dashboard-grid">
                                 <div class="stat-card">
                                     <div class="stat-content">
                                         <div class="stat-number" id="avg-mood">-</div>
-                                        <div class="stat-label">Average mood</div>
+                                        <div class="stat-label">Top mood</div>
                                     </div>
                                 </div>
                                 <div class="stat-card">
