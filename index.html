@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yan Liu - Designer & Developer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="styles.css?v=20250812-4">
+</head>
+<body>
+    <!-- Desktop Interface -->
+    <div class="desktop">
+        <!-- Taskbar -->
+        <div class="taskbar">
+            <div class="taskbar-left">
+                <div class="user-profile">
+                    <span><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span> yanliudesign</span>
+                </div>
+            </div>
+            <div class="taskbar-right">
+                <div class="date" id="current-date">Today</div>
+                <div class="time" id="current-time">12:00</div>
+            </div>
+        </div>
+
+        <!-- Desktop Icons - Left Side -->
+        <div class="desktop-icons desktop-icons-left">
+            <div class="icon" data-app="about">
+                <div class="icon-image"><img src="notebook.png" alt="Notebook" /></div>
+                <span>My notebook</span>
+            </div>
+            <div class="icon" data-app="skills">
+                <div class="icon-image"><img src="my sticker.png" alt="My sticker" /></div>
+                <span>My sticker</span>
+            </div>
+            <div class="icon" data-app="avatar">
+                <div class="icon-image"><img src="avatar creator.png" alt="Avatar Creator" /></div>
+                <span>Avatar creator</span>
+            </div>
+        </div>
+
+        <!-- Desktop Icons - Right Side -->
+        <div class="desktop-icons desktop-icons-right">
+            <div class="icon" data-app="mood">
+                <div class="icon-image"><img src="mood tracker.png" alt="Mood Tracker" /></div>
+                <span>Mood tracker</span>
+            </div>
+            <div class="icon" data-app="game">
+                <div class="icon-image"><img src="three in a row.png" alt="Three in a Row" /></div>
+                <span>Five in a row</span>
+            </div>
+            <div class="icon" data-app="contact">
+                <div class="icon-image"><img src="camera.png" alt="Camera" /></div>
+                <span>My camera</span>
+            </div>
+        </div>
+
+        <!-- Mini Music Player Widget -->
+        <div class="mini-music-player" id="music-player">
+            <div class="music-player-header">
+                <span class="music-icon">🎵</span>
+                <span class="music-title">Music player</span>
+            </div>
+            <div class="music-player-content">
+                <div class="music-visualizer-container">
+                    <canvas id="music-visualizer" class="music-visualizer"></canvas>
+                </div>
+                <div class="music-info">
+                    <div class="track-name">Chill Vibes</div>
+                    <div class="track-artist">Study Mix</div>
+                </div>
+                <div class="music-controls">
+                    <button class="music-btn prev-btn">⏮</button>
+                    <button class="music-btn play-pause-btn">▶</button>
+                    <button class="music-btn next-btn">⏭</button>
+                </div>
+                <div class="music-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="time-display">
+                        <span class="current-time">0:00</span>
+                        <span class="total-time">3:45</span>
+                    </div>
+                </div>
+                <div class="volume-control">
+                    <span class="volume-icon">🔊</span>
+                    <input type="range" class="volume-slider" min="0" max="100" value="50">
+                </div>
+            </div>
+        </div>
+
+        <!-- Windows -->
+        <div class="window about-window" data-window="about">
+            <div class="window-header">
+                <div class="window-title">My notebook</div>
+                <div class="window-controls">
+                    <span class="close">×</span>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="notebook-container">
+                    
+                    <div class="notebook-main">
+                        <div class="sticky-notes-section">
+                            <div class="sticky-notes-container" id="sticky-notes-container">
+                                <!-- Sticky notes will be added here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Note Editor Windows are now created dynamically -->
+
+        <div class="window projects-window" data-window="projects">
+            <div class="window-header">
+                <div class="window-title">My Projects</div>
+                <div class="window-controls">
+                    <span class="close">×</span>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="projects-grid">
+                    <div class="project-card">
+                        <div class="project-image">🎨</div>
+                        <h3>Design System</h3>
+                        <p>Created a comprehensive design system for a fintech startup</p>
+                        <div class="project-tags">
+                            <span>Figma</span>
+                            <span>Design Tokens</span>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <div class="project-image">📱</div>
+                        <h3>Mobile App</h3>
+                        <p>Designed and prototyped a health tracking mobile application</p>
+                        <div class="project-tags">
+                            <span>React Native</span>
+                            <span>UI/UX</span>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <div class="project-image">🌐</div>
+                        <h3>Portfolio Website</h3>
+                        <p>Built a responsive portfolio website with modern animations</p>
+                        <div class="project-tags">
+                            <span>HTML/CSS</span>
+                            <span>JavaScript</span>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <div class="project-image">💻</div>
+                        <h3>Web Application</h3>
+                        <p>Developed a project management tool for creative teams</p>
+                        <div class="project-tags">
+                            <span>Vue.js</span>
+                            <span>Node.js</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window skills-window" data-window="skills">
+            <div class="window-header">
+                <div class="window-title">My sticker</div>
+                <div class="window-controls">
+                    <span class="close">×</span>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="sticker-container">
+                    <div class="sticker-sidebar">
+                        <div class="sticker-search">
+                            <input type="text" id="sticker-search" placeholder="Search stickers..." />
+                        </div>
+                        <div class="category-menu">
+                            <div class="category-item active" data-category="all">All</div>
+                            <div class="category-item" data-category="ai-gen">AI art</div>
+                            <div class="category-item" data-category="lol">LOL</div>
+                            <div class="category-item" data-category="panda">Panda</div>
+                            <div class="category-item" data-category="work">Bobanized</div>
+                        </div>
+                    </div>
+                    <div class="sticker-main">
+                        <div class="sticker-grid" id="sticker-grid">
+                            <!-- AI Gen -->
+                            <div class="sticker-item" data-category="ai-gen">
+                                <img src="Sticker library/AI Gen/0266AC33-195C-4B1C-A488-B772900F459F.WEBP" alt="AI Gen 1">
+                            </div>
+                            <div class="sticker-item" data-category="ai-gen">
+                                <img src="Sticker library/AI Gen/16FC9FFE-A104-47D1-84C1-D0AA050A00B4.PNG" alt="AI Gen 2">
+                            </div>
+                            <div class="sticker-item" data-category="ai-gen">
+                                <img src="Sticker library/AI Gen/1EB971A6-BB01-44AB-9076-C789847C9998.WEBP" alt="AI Gen 3">
+                            </div>
+                            <div class="sticker-item" data-category="ai-gen">
+                                <img src="Sticker library/AI Gen/2BF9423F-9D33-4866-8EBF-D4857FD46FAA.WEBP" alt="AI Gen 4">
+                            </div>
+                            <div class="sticker-item" data-category="ai-gen">
+                                <img src="Sticker library/AI Gen/48E79E61-73CD-46F1-8C1C-AC4B377D2B12.WEBP" alt="AI Gen 5">
+                            </div>
+                            <div class="sticker-item" data-category="ai-gen">
+                                <img src="Sticker library/AI Gen/51D64BF4-F92A-4295-8234-EDFF9626FD2A.PNG" alt="AI Gen 6">
+                            </div>
+                            <div class="sticker-item" data-category="ai-gen">
+                                <img src="Sticker library/AI Gen/52D5CAB3-65FF-4785-9025-E7094F616DAA.WEBP" alt="AI Gen 7">
+                            </div>
+                            <div class="sticker-item" data-category="ai-gen">
+                                <img src="Sticker library/AI Gen/7BB484B7-142E-47A2-BD5E-CE59DFDF05E7.WEBP" alt="AI Gen 8">
+                            </div>
+                            <div class="sticker-item" data-category="ai-gen">
+                                <img src="Sticker library/AI Gen/810A3AFC-3F5E-4903-92F9-C7D388BF3D90.PNG" alt="AI Gen 9">
+                            </div>
+                            <div class="sticker-item" data-category="ai-gen">
+                                <img src="Sticker library/AI Gen/9DEF88DF-ADB7-466E-A53E-691A6F511475.WEBP" alt="AI Gen 10">
+                            </div>
+                            <div class="sticker-item" data-category="ai-gen">
+                                <img src="Sticker library/AI Gen/A0E92B78-73EA-4078-8272-5B4DBCF5C2F0.WEBP" alt="AI Gen 11">
+                            </div>
+                            <div class="sticker-item" data-category="ai-gen">
+                                <img src="Sticker library/AI Gen/A4B2C505-C4BE-4529-9917-138B192D4859.WEBP" alt="AI Gen 12">
+                            </div>
+                            <div class="sticker-item" data-category="ai-gen">
+                                <img src="Sticker library/AI Gen/F7008D52-569D-4308-BA67-E22D25E6E5AA.WEBP" alt="AI Gen 13">
+                            </div>
+                            <div class="sticker-item" data-category="ai-gen">
+                                <img src="Sticker library/AI Gen/FC79BC55-3F46-42A4-9205-E81AE4241462.WEBP" alt="AI Gen 14">
+                            </div>
+                            <div class="sticker-item" data-category="ai-gen">
+                                <img src="Sticker library/AI Gen/FDE31173-04BF-4516-BBE2-9C0DD3EF9C8F.WEBP" alt="AI Gen 15">
+                            </div>
+
+                            <!-- Cute & fluffy -->
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/Cute & fluffy/Cat Kitten Sticker.gif" alt="Cat Kitten">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/Cute & fluffy/Dance Dancing Sticker by Tonton Friends.gif" alt="Dance Dancing">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/Cute & fluffy/Good Night Sticker by moonie coco.gif" alt="Good Night">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/Cute & fluffy/Heart Love Sticker by kiktoyz.gif" alt="Heart Love">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/Cute & fluffy/On The Way Love Sticker.gif" alt="On The Way Love">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/Cute & fluffy/Puppy Love Sticker.gif" alt="Puppy Love">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/Cute & fluffy/Tired Sleep Sticker by NODAM_Khealth.gif" alt="Tired Sleep">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/Cute & fluffy/Valentines Day Love GIF by Gwyneth Draws.gif" alt="Valentines Day Love">
+                            </div>
+
+                            <!-- LOL -->
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/LOL/Cat Facepalm GIF.gif" alt="Cat Facepalm">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/LOL/Cat Fun GIF by Black Roses Playing Cards.gif" alt="Cat Fun">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/LOL/Cat Perfect Loops GIF.gif" alt="Cat Perfect Loops">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/LOL/Confused Dog GIF by MOODMAN.gif" alt="Confused Dog">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/LOL/Dog Water GIF.gif" alt="Dog Water">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/LOL/Golden Doodle Lol GIF by The BarkPost.gif" alt="Golden Doodle Lol">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/LOL/Toilet Paper Running Sticker by Sam Brown Video.gif" alt="Toilet Paper Running">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/LOL/Watching Beach Day Sticker by Pusheen.gif" alt="Watching Beach Day">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/LOL/What The Wtf GIF by Holler Studios.gif" alt="What The Wtf">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/LOL/funny dog GIF.gif" alt="funny dog">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/LOL/night world GIF.gif" alt="night world">
+                            </div>
+                            <div class="sticker-item" data-category="lol">
+                                <img src="Sticker library/LOL/people stay GIF.gif" alt="people stay">
+                            </div>
+
+                            <!-- Panda -->
+                            <div class="sticker-item" data-category="panda">
+                                <img src="Sticker library/Panda/Cartoon Network Bear Sticker by The_Oluk.gif" alt="Cartoon Network Bear">
+                            </div>
+                            <div class="sticker-item" data-category="panda">
+                                <img src="Sticker library/Panda/Coffee Day Love Sticker by Nadya Chay.gif" alt="Coffee Day Love">
+                            </div>
+                            <div class="sticker-item" data-category="panda">
+                                <img src="Sticker library/Panda/Dance Dancing Sticker.gif" alt="Dance Dancing">
+                            </div>
+                            <div class="sticker-item" data-category="panda">
+                                <img src="Sticker library/Panda/GIF by ADHDTV.gif" alt="GIF by ADHDTV">
+                            </div>
+                            <div class="sticker-item" data-category="panda">
+                                <img src="Sticker library/Panda/Hungry Nom Nom Sticker.gif" alt="Hungry Nom Nom">
+                            </div>
+                            <div class="sticker-item" data-category="panda">
+                                <img src="Sticker library/Panda/Loop Panda GIF.gif" alt="Loop Panda">
+                            </div>
+                            <div class="sticker-item" data-category="panda">
+                                <img src="Sticker library/Panda/National Panda Day GIF.gif" alt="National Panda Day">
+                            </div>
+                            <div class="sticker-item" data-category="panda">
+                                <img src="Sticker library/Panda/Pbs Nature Panda GIF by Nature on PBS.gif" alt="Pbs Nature Panda">
+                            </div>
+                            <div class="sticker-item" data-category="panda">
+                                <img src="Sticker library/Panda/panda STICKER.gif" alt="panda STICKER">
+                            </div>
+
+                            <!-- Tea & Coffee -->
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Tea & Coffee/Bubble Tea Fun Sticker.gif" alt="Bubble Tea Fun">
+                            </div>
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Tea & Coffee/Bubble Tea Pink Sticker by Pandi the Panda.gif" alt="Bubble Tea Pink">
+                            </div>
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Tea & Coffee/Refreshing Boba Tea Sticker by Pusheen.gif" alt="Refreshing Boba Tea">
+                            </div>
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Tea & Coffee/Tea Party Cat Sticker by Pusheen.gif" alt="Tea Party Cat">
+                            </div>
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Tea & Coffee/Tea Time Drinking Sticker.gif" alt="Tea Time Drinking">
+                            </div>
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Tea & Coffee/Which One Are You Cat Sticker by Pusheen.gif" alt="Which One Are You Cat">
+                            </div>
+
+                            <!-- Work -->
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Work/Angry Loop Sticker by Kennysgifs.gif" alt="Angry Loop">
+                            </div>
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Work/Cat GIF by hoppip.gif" alt="Cat GIF by hoppip">
+                            </div>
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Work/Cat Working Hard Sticker.gif" alt="Cat Working Hard">
+                            </div>
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Work/Computer Email Sticker.gif" alt="Computer Email">
+                            </div>
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Work/Computer Laptop Sticker by exotic cancer.gif" alt="Computer Laptop">
+                            </div>
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Work/Pixel 90S Sticker.gif" alt="Pixel 90S">
+                            </div>
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Work/Study 勉強 Sticker by おめがちゃん.gif" alt="Study">
+                            </div>
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Work/Vintage Computer Sticker.gif" alt="Vintage Computer">
+                            </div>
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Work/Work Love Sticker.gif" alt="Work Love">
+                            </div>
+                            <div class="sticker-item" data-category="work">
+                                <img src="Sticker library/Work/Work Working Sticker.gif" alt="Work Working">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window contact-window" data-window="contact">
+            <div class="window-header">
+                <div class="window-title">My camera</div>
+                <div class="window-controls">
+                    <span class="close">×</span>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="camera-content">
+                    <div class="camera-interface">
+                        <div class="camera-preview">
+                            <video id="camera-video" autoplay playsinline></video>
+                            
+                            <!-- Cute decorative elements -->
+                            <div class="camera-decorations">
+                                <div class="love-sticker">
+                                    <img src="My camera/Love You Sticker.gif" alt="Love You Sticker">
+                                </div>
+                            </div>
+                            
+                            <div class="camera-overlay-controls">
+                                <button id="take-photo-btn" class="camera-shutter-btn" disabled>
+                                    <div class="shutter-circle">
+                                        <div class="shutter-inner"></div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="camera-controls">
+                            <div class="controls-row">
+                                <div class="camera-control-group">
+                                    <button id="start-camera-btn" class="camera-btn">Start</button>
+                                    <button id="stop-camera-btn" class="camera-btn" disabled>Stop</button>
+                                </div>
+                                <div class="filter-controls">
+                                    <label for="filter-select">Filter:</label>
+                                    <select id="filter-select" class="filter-dropdown">
+                                        <option value="none">None</option>
+                                        <option value="retro">Retro 70s</option>
+                                        <option value="soft">Dreamy</option>
+                                        <option value="saturated">Vibrant Pop</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="photo-gallery">
+                            <h4>My Photos</h4>
+                            <div id="photo-gallery-container" class="gallery-container">
+                                <div class="no-photos">
+                                    No photos taken yet
+                                    <br><br>
+                                    <img src="pixel gif/Hello Kitty Hearts Sticker.gif" alt="Hello Kitty Hearts" class="no-photos-sticker">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Clock Widget -->
+        <div class="window clock-window" data-window="clock">
+            <div class="window-header">
+                <div class="window-title">Clock</div>
+                <div class="window-controls">
+                    <span class="close">×</span>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="clock-widget">
+                    <div class="analog-clock">
+                        <div class="clock-face">
+                            <div class="hour-hand"></div>
+                            <div class="minute-hand"></div>
+                            <div class="second-hand"></div>
+                            <div class="center-dot"></div>
+                        </div>
+                    </div>
+                    <div class="digital-time">
+                        <div class="digital-clock" id="digital-clock">12:00:00</div>
+                        <div class="timezone" id="timezone">Local Time</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Widget -->
+        <div class="window calendar-window" data-window="calendar">
+            <div class="window-header">
+                <div class="window-title">Calendar</div>
+                <div class="window-controls">
+                    <span class="close">×</span>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="calendar-widget">
+                    <div class="calendar-header">
+                        <button class="prev-month">‹</button>
+                        <div class="month-year" id="month-year">January 2024</div>
+                        <button class="next-month">›</button>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="day-header">Sun</div>
+                        <div class="day-header">Mon</div>
+                        <div class="day-header">Tue</div>
+                        <div class="day-header">Wed</div>
+                        <div class="day-header">Thu</div>
+                        <div class="day-header">Fri</div>
+                        <div class="day-header">Sat</div>
+                        <div class="calendar-days" id="calendar-days"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Five in a Row Game Window -->
+        <div class="window game-window" data-window="game">
+            <div class="window-header">
+                <div class="window-title">Five in a row</div>
+                <div class="window-controls">
+                    <span class="close">×</span>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="game-container">
+                    <div class="game-board" id="game-board">
+                        <!-- Board and message will be generated by JavaScript -->
+                    </div>
+                    <button id="reset-game" class="game-btn">Start new game</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Avatar Creator Window -->
+        <div class="window avatar-window" data-window="avatar">
+            <div class="window-header">
+                <div class="window-title">Avatar creator</div>
+                <div class="window-controls">
+                    <span class="close">×</span>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="avatar-creator">
+                    <div class="avatar-left-panel">
+                        <div class="avatar-preview">
+                            <div class="avatar-canvas" id="avatar-canvas">
+                                <!-- SVG avatar will be generated here -->
+                            </div>
+                        </div>
+                        <div class="avatar-actions">
+                            <button class="avatar-btn" onclick="window.portfolioOS.downloadAvatarV2()">Download</button>
+                            <button class="avatar-btn" onclick="window.portfolioOS.randomizeAvatar()">Random</button>
+                            <button class="avatar-btn" onclick="window.portfolioOS.resetAvatar()">Reset</button>
+                        </div>
+                    </div>
+                    
+                    <div class="avatar-right-panel">
+                        <div class="category-tabs">
+                            <div class="category-tab active" data-category="head">Head</div>
+                            <div class="category-tab" data-category="clothes">Clothes</div>
+                            <div class="category-tab" data-category="accessory">Accessories</div>
+                        </div>
+                        
+                        <div class="category-content">
+                            <div class="category-panel active" data-category="head">
+                                <div class="visual-options-grid" id="head-options">
+                                    <!-- Head options will be populated by JS -->
+                                </div>
+                            </div>
+                            
+                            <div class="category-panel" data-category="clothes">
+                                <div class="visual-options-grid" id="clothes-options">
+                                    <!-- Clothes options will be populated by JS -->
+                                </div>
+                            </div>
+                            
+                            <div class="category-panel" data-category="accessory">
+                                <div class="visual-options-grid" id="accessory-options">
+                                    <!-- Accessory options will be populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mood Tracker Window -->
+        <div class="window mood-window" data-window="mood">
+            <div class="window-header">
+                <div class="window-title">Mood tracker</div>
+                <div class="window-controls">
+                    <span class="close">×</span>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="mood-tracker-content">
+                    <!-- Daily Mood Entry -->
+                    <div class="mood-entry-section">
+                        <h3>How was your day?</h3>
+                        <div class="mood-selection">
+                            <div class="mood-buttons-grid">
+                                <button class="mood-btn" data-mood="0">
+                                    <img src="Mood track emojis/1.svg" alt="Mood 1" />
+                                </button>
+                                <button class="mood-btn" data-mood="1">
+                                    <img src="Mood track emojis/2.svg" alt="Mood 2" />
+                                </button>
+                                <button class="mood-btn" data-mood="2">
+                                    <img src="Mood track emojis/3.svg" alt="Mood 3" />
+                                </button>
+                                <button class="mood-btn" data-mood="3">
+                                    <img src="Mood track emojis/4.svg" alt="Mood 4" />
+                                </button>
+                                <button class="mood-btn" data-mood="4">
+                                    <img src="Mood track emojis/5.svg" alt="Mood 5" />
+                                </button>
+                                <button class="mood-btn" data-mood="5">
+                                    <img src="Mood track emojis/6.svg" alt="Mood 6" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Dashboard -->
+                    <div class="mood-analytics-section">
+                        <!-- Monthly Calendar -->
+                        <div class="mood-calendar">
+                            <div class="calendar-header">
+                                <button class="nav-btn" id="mood-prev-month">‹</button>
+                                <h4 id="mood-calendar-title">August 2025</h4>
+                                <button class="nav-btn" id="mood-next-month">›</button>
+                            </div>
+                            <div class="simple-calendar">
+                                <div class="weekday-headers">
+                                    <div class="weekday">Sun</div>
+                                    <div class="weekday">Mon</div>
+                                    <div class="weekday">Tue</div>
+                                    <div class="weekday">Wed</div>
+                                    <div class="weekday">Thu</div>
+                                    <div class="weekday">Fri</div>
+                                    <div class="weekday">Sat</div>
+                                </div>
+                                <div class="calendar-dates" id="mood-calendar-dates">
+                                    <!-- Simple calendar dates 1-31 -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Monthly Dashboard -->
+                        <div class="mood-dashboard">
+                            <div class="insights-tabs">
+                                <button class="tab-btn active" data-tab="monthly">Monthly insights</button>
+                                <button class="tab-btn" data-tab="yearly">Yearly insights</button>
+                            </div>
+                            <div class="dashboard-grid">
+                                <div class="stat-card">
+                                    <div class="stat-content">
+                                        <div class="stat-number" id="avg-mood">-</div>
+                                        <div class="stat-label">Average mood</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-content">
+                                        <div class="stat-number" id="best-day">-</div>
+                                        <div class="stat-label">Best day</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-content">
+                                        <div class="stat-number" id="total-entries">0</div>
+                                        <div class="stat-label">Days tracked</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-content">
+                                        <div class="stat-number" id="current-streak">0</div>
+                                        <div class="stat-label">Days streak</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script src="script.js?v=20250812-2"></script>
+</body>
+</html>
