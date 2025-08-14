@@ -3266,7 +3266,14 @@ class PortfolioOS {
         stickyElement.addEventListener('click', (e) => {
             if (!dragStarted && !isDragging && 
                 !e.target.classList.contains('sticky-note-icon')) {
-                this.editStickyNote(note);
+                // Prevent the notebook window from coming to front
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Small delay to avoid competing focus events
+                setTimeout(() => {
+                    this.editStickyNote(note);
+                }, 10);
             }
         });
         
@@ -3579,8 +3586,8 @@ class PortfolioOS {
         console.log('🚨 recalculateWindowLayers called');
         console.trace(); // This will show the call stack
         
-        // Base z-index for all windows
-        const baseZIndex = 1000;
+        // Base z-index for all windows - high enough to be above all main app windows
+        const baseZIndex = 100000;
         
         // Get all active windows
         const allWindows = document.querySelectorAll('.window.active, .note-editor-window.active, .sticker-preview-window');
