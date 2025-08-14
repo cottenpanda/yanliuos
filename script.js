@@ -3583,8 +3583,8 @@ class PortfolioOS {
             return;
         }
         
-        console.log('🚨 recalculateWindowLayers called');
-        console.trace(); // This will show the call stack
+        // console.log('🚨 recalculateWindowLayers called');
+        // console.trace(); // This will show the call stack
         
         // Base z-index for all windows - high enough to be above all main app windows
         const baseZIndex = 100000;
@@ -3599,15 +3599,15 @@ class PortfolioOS {
             windowMap.set(windowId, win);
         });
         
-        console.log('🔄 Recalculating layers. Current layer order:', [...this.windowLayerOrder]);
-        console.log('🔄 Found active windows:', Array.from(allWindows).map(w => this.getWindowId(w)));
+        // console.log('🔄 Recalculating layers. Current layer order:', [...this.windowLayerOrder]);
+        // console.log('🔄 Found active windows:', Array.from(allWindows).map(w => this.getWindowId(w)));
         
         // Show current z-indices
-        allWindows.forEach(win => {
-            const id = this.getWindowId(win);
-            const zIndex = window.getComputedStyle(win).zIndex;
-            console.log(`  ${id}: z-index = ${zIndex}`);
-        });
+        // allWindows.forEach(win => {
+        //     const id = this.getWindowId(win);
+        //     const zIndex = window.getComputedStyle(win).zIndex;
+        //     console.log(`  ${id}: z-index = ${zIndex}`);
+        // });
         
         // Clean up layer order - remove windows that no longer exist
         const originalLayerOrder = [...this.windowLayerOrder];
@@ -9408,7 +9408,11 @@ PortfolioOS.prototype.setupMoodButtons = function() {
     const moodButtons = document.querySelectorAll('.mood-btn');
     
     moodButtons.forEach((button, index) => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', (e) => {
+            // Stop event from bubbling up to window management
+            e.preventDefault();
+            e.stopPropagation();
+            
             // Remove active class from all buttons
             moodButtons.forEach(btn => btn.classList.remove('selected'));
             
@@ -9418,12 +9422,16 @@ PortfolioOS.prototype.setupMoodButtons = function() {
             // Play mood selection sound (unique for each emoji)
             this.playMoodSelectSound(index);
             
-            // Create flying emoji animation FIRST - mood updates happen after landing
+            // Create flying emoji animation - update calendar when it lands
             this.createFlyingEmojiAnimation(button, index, () => {
-                // Callback: Update everything AFTER emoji lands
+                // Update mood data when emoji lands (quick operations only)
                 this.saveTodaysMood(index);
                 this.updateCalendarMood(index);
-                this.updateMoodAnalytics();
+                
+                // Delay heavy analytics update to avoid jank
+                setTimeout(() => {
+                    this.updateMoodAnalytics();
+                }, 100);
             });
             
             // Create particle effect
@@ -9457,53 +9465,37 @@ PortfolioOS.prototype.createFlyingEmojiAnimation = function(button, moodIndex, o
     const buttonRect = button.getBoundingClientRect();
     const dateBoxRect = todayDateBox.getBoundingClientRect();
     
-    // Position flying emoji at button location (centered)
+    // Position flying emoji at button location
     flyingEmoji.style.left = `${buttonRect.left + buttonRect.width / 2 - 30}px`;
     flyingEmoji.style.top = `${buttonRect.top + buttonRect.height / 2 - 30}px`;
     flyingEmoji.style.opacity = '1';
-    flyingEmoji.style.transform = 'scale(1)';
     flyingEmoji.style.position = 'fixed';
     flyingEmoji.style.pointerEvents = 'none';
-    flyingEmoji.style.zIndex = '9999';
+    flyingEmoji.style.zIndex = '999999';
     
     // Add to document
     document.body.appendChild(flyingEmoji);
     
-    // Create a dramatic arc animation
-    const startX = buttonRect.left + buttonRect.width / 2 - 30;
-    const startY = buttonRect.top + buttonRect.height / 2 - 30;
-    const endX = dateBoxRect.left + dateBoxRect.width / 2 - 30;
-    const endY = dateBoxRect.top + dateBoxRect.height / 2 - 30;
-    
-    // Calculate arc peak (higher for more dramatic effect)
-    const midX = (startX + endX) / 2;
-    const midY = Math.min(startY, endY) - 100; // Arc peak
-    
-    // Smoother animation timing with better transitions
-    flyingEmoji.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-    
-    // Use requestAnimationFrame for smoother animation
-    requestAnimationFrame(() => {
-        // First phase: animate to arc peak (0.8s)
-        flyingEmoji.style.left = `${midX}px`;
-        flyingEmoji.style.top = `${midY}px`;
-        flyingEmoji.style.transform = 'scale(1.5) rotate(180deg)';
+    // Simple direct animation to calendar
+    setTimeout(() => {
+        flyingEmoji.style.transition = 'all 1s ease-out';
+        flyingEmoji.style.left = `${dateBoxRect.left + dateBoxRect.width / 2 - 30}px`;
+        flyingEmoji.style.top = `${dateBoxRect.top + dateBoxRect.height / 2 - 30}px`;
+        flyingEmoji.style.transform = 'rotate(720deg) scale(0.8)';
+        flyingEmoji.style.opacity = '0.8';
         
-        // Second phase: animate to final position (0.7s)
+        // Call callback when emoji lands (earlier for smoother experience)
         setTimeout(() => {
-            flyingEmoji.style.transition = 'all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-            flyingEmoji.style.left = `${endX}px`;
-            flyingEmoji.style.top = `${endY}px`;
-            flyingEmoji.style.transform = 'scale(1.2) rotate(360deg)';
-        }, 750);
+            if (onLandingCallback) {
+                onLandingCallback();
+            }
+        }, 800);
         
-        // Final landing effect (0.4s) - clean fade without extra rotation
+        // Fade out
         setTimeout(() => {
-            flyingEmoji.style.transition = 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-            flyingEmoji.style.transform = 'scale(1.1) rotate(360deg)';
             flyingEmoji.style.opacity = '0';
-        }, 1400);
-    });
+        }, 800);
+    }, 100);
     
     // Remove element after animation (total: 1.8s)
     setTimeout(() => {
@@ -9513,11 +9505,6 @@ PortfolioOS.prototype.createFlyingEmojiAnimation = function(button, moodIndex, o
         
         // Play landing sound (unique for each emoji)
         this.playEmojiLandSound(moodIndex);
-        
-        // Execute callback to update mood data AFTER landing
-        if (onLandingCallback) {
-            onLandingCallback();
-        }
         
         // Add a bounce effect to the calendar date
         todayDateBox.style.transform = 'scale(1.2)';
