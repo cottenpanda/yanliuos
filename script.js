@@ -2915,17 +2915,31 @@ class PortfolioOS {
         // Check drop target
         const elementBelow = document.elementFromPoint(pointerEvent.clientX, pointerEvent.clientY);
         const isOverWindow = elementBelow?.closest('.window, .sticker-preview-window, .note-editor-window');
-        const noteEditor = elementBelow?.closest('.note-modal-editor, .notebook-editor');
+        
+        // Find the actual note editor, excluding auto-save indicators
+        let noteEditor = elementBelow?.closest('.note-modal-editor, .notebook-editor');
+        if (elementBelow?.classList.contains('auto-save-indicator')) {
+            // If we hit the auto-save indicator, look for the parent editor
+            noteEditor = elementBelow?.closest('.note-editor-window')?.querySelector('.note-modal-editor, .notebook-editor');
+        }
         
         if (noteEditor) {
+            // Make sure we're not adding to the auto-save indicator
+            if (noteEditor.classList.contains('auto-save-indicator')) {
+                console.log('❌ Blocked - trying to add to save indicator');
+                return;
+            }
+            
             // Drop on note editor - add to content
             const stickerHtml = `<img src="${stickerData.src}" alt="${stickerData.alt}" style="width: 60px; height: auto; display: inline-block; margin: 2px;">`;
             if (noteEditor.isContentEditable) {
+                // Focus the editor first
+                noteEditor.focus();
                 document.execCommand('insertHTML', false, stickerHtml);
             } else {
                 noteEditor.innerHTML += stickerHtml;
             }
-            console.log('✅ Sticker added to note');
+            console.log('✅ Sticker added to note editor');
         } else if (!isOverWindow) {
             // Drop on desktop - create desktop sticker ONLY here
             const rect = ghost.getBoundingClientRect();
