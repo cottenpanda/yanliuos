@@ -2414,52 +2414,98 @@ class PortfolioOS {
         console.log('Setting up sticker modal for', stickerItems.length, 'stickers');
         
         stickerItems.forEach(item => {
-            // Make stickers draggable
-            item.draggable = true;
+            if (item.dataset.dragSetup) return;
+            item.dataset.dragSetup = true;
+            // COMPLETELY disable HTML5 drag system
+            item.draggable = false;
+            item.style.webkitUserDrag = 'none';
+            item.style.userDrag = 'none';
             
-            // Add drag start handler
-            item.addEventListener('dragstart', (e) => {
+            // Prevent nested drags on images
+            const img = item.querySelector('img');
+            if (img) {
+                img.draggable = false;
+                img.style.webkitUserDrag = 'none';
+                img.style.userDrag = 'none';
+            }
+            
+            let isDragging = false;
+            let wasDragging = false;
+            let ghostElement = null;
+            let stickerData = null;
+            
+            // ONLY use pointer events - no mixing with mouse events
+            item.addEventListener('pointerdown', (e) => {
+                let pointerUpCalled = false;
+                // Guard against double firing
+                if (isDragging) {
+                    console.log('❌ Ignoring - already dragging');
+                    return;
+                }
+                
+                isDragging = false;
+                const startX = e.clientX;
+                const startY = e.clientY;
                 const img = item.querySelector('img');
-                const stickerHtml = `<img src="${img.src}" alt="${img.alt}" style="width: 60px; height: auto; display: inline-block; margin: 2px;">`;
+                stickerData = { src: img.src, alt: img.alt };
                 
-                console.log('=== DRAG START DEBUG ===');
-                console.log('Dragging sticker:', img.alt);
-                console.log('Image src:', img.src);
-                console.log('Generated HTML:', stickerHtml);
+                const handlePointerMove = (moveEvent) => {
+                    const distance = Math.sqrt(
+                        Math.pow(moveEvent.clientX - startX, 2) + 
+                        Math.pow(moveEvent.clientY - startY, 2)
+                    );
+                    
+                    if (!isDragging && distance > 5) {
+                        // Start drag - create ghost/preview only
+                        isDragging = true;
+                        wasDragging = true;
+                        console.log('🚀 Starting drag - creating ghost');
+                        ghostElement = this.createDragGhost(stickerData.src, stickerData.alt, moveEvent);
+                    } else if (isDragging && ghostElement) {
+                        // Update ghost position
+                        this.updateDragGhost(ghostElement, moveEvent);
+                    }
+                };
                 
-                e.dataTransfer.setData('text/html', stickerHtml);
-                e.dataTransfer.setData('text/plain', img.alt);
+                const handlePointerUp = (upEvent) => {
+                    if (pointerUpCalled) return;
+                    pointerUpCalled = true;
+                    document.removeEventListener('pointermove', handlePointerMove);
+                    document.removeEventListener('pointerup', handlePointerUp);
+                    
+                    if (wasDragging) {
+                        if (ghostElement) {
+                            // Pattern B: Create desktop sticker ONLY on drop, not on start
+                            console.log('🎯 Drop - creating sticker instance');
+                            this.handleStickerDrop(stickerData, ghostElement, upEvent);
+                            ghostElement.remove();
+                            ghostElement = null;
+                        }
+                    } else {
+                        // Handle as click
+                        if (e.shiftKey) {
+                            this.showStickerModal(stickerData.src, stickerData.alt);
+                        } else {
+                            // Pattern B: Create ONLY here for clicks, nowhere else
+                            console.log('🖱️ Click - creating sticker instance');
+                            this.placeStickerOnDesktop(stickerData.src, stickerData.alt, upEvent);
+                        }
+                    }
+                    
+                    // Reset ALL state
+                    isDragging = false;
+                    wasDragging = false;
+                    ghostElement = null;
+                    stickerData = null;
+                };
                 
-                // Add visual feedback
-                item.classList.add('dragging');
-                console.log('Drag data set successfully');
-            });
-            
-            // Add drag end handler
-            item.addEventListener('dragend', (e) => {
-                item.classList.remove('dragging');
-            });
-            
-            // Click handler for modal view
-            item.addEventListener('click', (e) => {
+                document.addEventListener('pointermove', handlePointerMove);
+                document.addEventListener('pointerup', handlePointerUp);
+                
                 e.preventDefault();
                 e.stopPropagation();
-                const img = item.querySelector('img');
-                this.showStickerModal(img.src, img.alt);
             });
         });
-        
-        // Setup drop zones for note editors
-        this.setupNoteDropZones();
-        
-        // Also force setup drop zones for any existing note windows right now
-        setTimeout(() => {
-            const noteWindows = document.querySelectorAll('.note-editor-window');
-            console.log('Force setting up drop zones for', noteWindows.length, 'existing note windows');
-            noteWindows.forEach(noteWindow => {
-                this.addDropZoneToEditor(noteWindow);
-            });
-        }, 100);
     }
     
     setupNoteDropZones() {
@@ -2818,6 +2864,248 @@ class PortfolioOS {
             } else {
                 item.style.display = 'none';
             }
+        });
+    }
+
+    createDragGhost(src, alt, pointerEvent) {
+        const ghost = document.createElement('div');
+        ghost.className = 'drag-ghost';
+        ghost.innerHTML = `<img src="${src}" alt="${alt}" style="width: 80px; height: auto; pointer-events: none;">`;
+        
+        // Set highest z-index
+        this.windowZIndex += 10;
+        
+        // Style as ghost/preview (not final sticker)
+        ghost.style.cssText = `
+            position: fixed;
+            left: ${pointerEvent.clientX - 40}px;
+            top: ${pointerEvent.clientY - 40}px;
+            z-index: ${this.windowZIndex};
+            cursor: grabbing;
+            user-select: none;
+            padding: 5px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+            transform: scale(1.1);
+            transition: none;
+            pointer-events: none;
+            opacity: 0.8;
+        `;
+        
+        document.body.appendChild(ghost);
+        return ghost;
+    }
+    
+    updateDragGhost(ghost, pointerEvent) {
+        if (!ghost) return;
+        
+        // Clamp to desktop bounds
+        let left = pointerEvent.clientX - 40;
+        let top = pointerEvent.clientY - 40;
+        
+        left = Math.max(0, Math.min(left, window.innerWidth - 100));
+        top = Math.max(60, Math.min(top, window.innerHeight - 100)); // Above taskbar
+        
+        ghost.style.left = `${left}px`;
+        ghost.style.top = `${top}px`;
+    }
+    
+    handleStickerDrop(stickerData, ghost, pointerEvent) {
+        // Check drop target
+        const elementBelow = document.elementFromPoint(pointerEvent.clientX, pointerEvent.clientY);
+        const isOverWindow = elementBelow?.closest('.window, .sticker-preview-window, .note-editor-window');
+        const noteEditor = elementBelow?.closest('.note-modal-editor, .notebook-editor');
+        
+        if (noteEditor) {
+            // Drop on note editor - add to content
+            const stickerHtml = `<img src="${stickerData.src}" alt="${stickerData.alt}" style="width: 60px; height: auto; display: inline-block; margin: 2px;">`;
+            if (noteEditor.isContentEditable) {
+                document.execCommand('insertHTML', false, stickerHtml);
+            } else {
+                noteEditor.innerHTML += stickerHtml;
+            }
+            console.log('✅ Sticker added to note');
+        } else if (!isOverWindow) {
+            // Drop on desktop - create desktop sticker ONLY here
+            const rect = ghost.getBoundingClientRect();
+            this.createDesktopSticker(stickerData.src, stickerData.alt, {
+                clientX: rect.left + 40,
+                clientY: rect.top + 40
+            });
+            console.log('✅ Sticker placed on desktop');
+        }
+        // If dropped on other windows, do nothing (sticker disappears)
+    }
+
+    createDesktopSticker(src, alt, position) {
+        // Create a desktop sticker element
+        const desktopSticker = document.createElement('div');
+        desktopSticker.className = 'desktop-sticker';
+        desktopSticker.innerHTML = `<img src="${src}" alt="${alt}" style="width: 80px; height: auto; pointer-events: none;">`;
+        
+        // Position where dropped or clicked
+        let left = position.clientX - 40;
+        let top = position.clientY - 40;
+        
+        // Ensure it's within screen bounds
+        left = Math.max(0, Math.min(left, window.innerWidth - 100));
+        top = Math.max(60, Math.min(top, window.innerHeight - 100)); // Above taskbar
+        
+        // Style the desktop sticker
+        desktopSticker.style.cssText = `
+            position: absolute;
+            left: ${left}px;
+            top: ${top}px;
+            z-index: 500;
+            cursor: move;
+            user-select: none;
+            transition: transform 0.2s ease;
+        `;
+        
+        // Add interactions
+        this.addDesktopStickerInteractions(desktopSticker);
+        
+        // Add to desktop
+        document.body.appendChild(desktopSticker);
+        
+        console.log('🌟 Created desktop sticker:', alt);
+        return desktopSticker;
+    }
+
+    placeStickerOnDesktop(src, alt, clickEvent) {
+        // Use the new createDesktopSticker function instead
+        return this.createDesktopSticker(src, alt, clickEvent);
+    }
+
+    addDesktopStickerInteractions(stickerElement) {
+        let isDragging = false;
+        let startTime = 0;
+        
+        // Add hover effect
+        stickerElement.addEventListener('pointerenter', () => {
+            if (!isDragging) {
+                stickerElement.style.transform = 'scale(1.1)';
+            }
+        });
+        
+        stickerElement.addEventListener('pointerleave', () => {
+            if (!isDragging) {
+                stickerElement.style.transform = 'scale(1)';
+            }
+        });
+        
+        // Use pointer events for consistent behavior
+        stickerElement.addEventListener('pointerdown', (e) => {
+            startTime = Date.now();
+            isDragging = false;
+            
+            // Set highest z-index immediately so it stays on top
+            stickerElement.style.setProperty('z-index', '999999', 'important');
+            
+            const startX = e.clientX;
+            const startY = e.clientY;
+            const rect = stickerElement.getBoundingClientRect();
+            const startLeft = rect.left;
+            const startTop = rect.top;
+            
+            const handlePointerMove = (moveEvent) => {
+                if (!isDragging) {
+                    // Check if we should start dragging
+                    const distance = Math.sqrt(
+                        Math.pow(moveEvent.clientX - startX, 2) + 
+                        Math.pow(moveEvent.clientY - startY, 2)
+                    );
+                    
+                    if (distance > 5) {
+                        isDragging = true;
+                        stickerElement.style.cursor = 'grabbing';
+                        stickerElement.style.transform = 'scale(1.1)';
+                    }
+                }
+                
+                if (isDragging) {
+                    const deltaX = moveEvent.clientX - startX;
+                    const deltaY = moveEvent.clientY - startY;
+                    
+                    let newLeft = startLeft + deltaX;
+                    let newTop = startTop + deltaY;
+                    
+                    // Clamp to desktop bounds
+                    newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - 100));
+                    newTop = Math.max(60, Math.min(newTop, window.innerHeight - 100)); // Above taskbar
+                    
+                    stickerElement.style.left = `${newLeft}px`;
+                    stickerElement.style.top = `${newTop}px`;
+                }
+            };
+            
+            const handlePointerUp = (upEvent) => {
+                document.removeEventListener('pointermove', handlePointerMove);
+                document.removeEventListener('pointerup', handlePointerUp);
+                
+                if (!isDragging) {
+                    // Handle as click - check for double-click to remove
+                    const timeSinceDown = Date.now() - startTime;
+                    if (timeSinceDown < 500) {
+                        // Quick click - could be part of double-click
+                        setTimeout(() => {
+                            if (!stickerElement._doubleClicked) {
+                                // Single click - do nothing special
+                            }
+                            stickerElement._doubleClicked = false;
+                        }, 300);
+                    }
+                } else {
+                    // End drag - check if dropped on note editor
+                    stickerElement.style.pointerEvents = 'none';
+                    const elementBelow = document.elementFromPoint(upEvent.clientX, upEvent.clientY);
+                    stickerElement.style.pointerEvents = 'auto';
+                    const noteEditor = elementBelow?.closest('.note-modal-editor, .notebook-editor');
+                    
+                    if (noteEditor) {
+                        // Dropped on note editor - add to content and remove desktop sticker
+                        const img = stickerElement.querySelector('img');
+                        const stickerHtml = `<img src="${img.src}" alt="${img.alt}" style="width: 60px; height: auto; display: inline-block; margin: 2px;">`;
+                        
+                        if (noteEditor.isContentEditable) {
+                            // Focus the editor and insert at cursor
+                            noteEditor.focus();
+                            document.execCommand('insertHTML', false, stickerHtml);
+                        } else {
+                            noteEditor.innerHTML += stickerHtml;
+                        }
+                        
+                        // Remove the desktop sticker with animation
+                        stickerElement.style.transform = 'scale(0)';
+                        stickerElement.style.opacity = '0';
+                        setTimeout(() => stickerElement.remove(), 200);
+                        
+                        console.log('✅ Desktop sticker moved to note editor');
+                    } else {
+                        // Normal drag end - just reset styling
+                        stickerElement.style.cursor = 'move';
+                        stickerElement.style.transform = 'scale(1)';
+                        stickerElement.style.setProperty('z-index', '500');
+                    }
+                }
+                
+                isDragging = false;
+            };
+            
+            document.addEventListener('pointermove', handlePointerMove);
+            document.addEventListener('pointerup', handlePointerUp);
+            
+            e.preventDefault();
+        });
+        
+        // Double-click to remove
+        stickerElement.addEventListener('dblclick', () => {
+            stickerElement._doubleClicked = true;
+            stickerElement.style.transform = 'scale(0)';
+            stickerElement.style.opacity = '0';
+            setTimeout(() => stickerElement.remove(), 200);
+            console.log('🗑️ Desktop sticker removed');
         });
     }
 
@@ -9408,14 +9696,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     
-    // Also try to auto-setup every few seconds as fallback
-    setInterval(() => {
-        const stickerItems = document.querySelectorAll('.sticker-item:not([draggable="true"])');
-        if (stickerItems.length > 0 && window.portfolioOS) {
-            console.log('Auto-setting up', stickerItems.length, 'non-draggable stickers');
-            window.portfolioOS.forceStickerDragSetup();
-        }
-    }, 5000);
+    
 });
 
 // Mood Tracker functionality
